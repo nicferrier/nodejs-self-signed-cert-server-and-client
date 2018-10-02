@@ -17,7 +17,7 @@ node server.js
 
 and a demonstration will be performed.
 
-For those curious the steps should be this bash:
+For those curious, the steps should be, first:
 
 ```bash
 echo 01 > cacert.srl
