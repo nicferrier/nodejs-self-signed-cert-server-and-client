@@ -12,7 +12,7 @@ Just:
 
 ```
 npm install
-node server.js
+npm test
 ```
 
 and a demonstration will be performed.
@@ -63,3 +63,15 @@ and a request object can have the CA:
 ```
 
 and that's it.
+
+## Using fetch
+
+Fetch under node is a bit different. With node-fetch, for example, you
+need to use an Agent for fetch:
+
+```javascript
+let response = await fetch("https://localhost:2443", {
+  agent: new https.Agent({ ca: ca })
+});
+let fetchHtml = await response.text();
+```

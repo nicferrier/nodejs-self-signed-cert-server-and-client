@@ -3,6 +3,7 @@ const fs = require("fs");
 const https = require("https");
 const { spawn } = require("child_process");
 const assert = require("assert");
+const fetch = require("node-fetch");
 
 const app = express();
 
@@ -21,15 +22,22 @@ async function main () {
   });
 
   console.log("cert create shell script exit>", bashResult);
+
+  if (bashResult > 0) {
+    return [new Error({bashResult: bashResult})];
+  }
   
   let opts = { 
     key: await fs.promises.readFile("my.key"),
     cert: await fs.promises.readFile("cert.pem")
   };
-  return await https.createServer(opts, app).listen(2443);
+  return [undefined, await https.createServer(opts, app).listen(2443)];
 }
 
-main().then(async listener => {
+main().then(async ([err, listener]) => {
+  if (err != undefined) {
+    process.exit(1);
+  }
   let ca = await fs.promises.readFile("cacert.pem");
   let opts = {
     method: 'GET',
@@ -53,6 +61,15 @@ main().then(async listener => {
   });
 
   assert.deepStrictEqual(html, body);
-  
+
+  /* fetch client */
+  let fetchAgent = new https.Agent({ ca: ca });
+  let response = await fetch("https://localhost:2443", {
+    agent: fetchAgent
+  });
+  let fetchHtml = await response.text();
+  assert.deepStrictEqual(fetchHtml, html);
+
+  /* now die */
   listener.close();
 });
