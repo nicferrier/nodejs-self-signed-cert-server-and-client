@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "eventsource": "^1.0.7",
     "express": "^4.16.3",
     "node-fetch": "^2.2.0"
   }
